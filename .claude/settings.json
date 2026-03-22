@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "deploy-on-aws@claude-plugins-official": true,
+    "aws-serverless@claude-plugins-official": true,
+    "context7@claude-plugins-official": true
+  }
+}

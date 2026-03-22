@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: LINE Messaging API Bot
+
+Globals:
+  Function:
+    Timeout: 10
+
+Parameters:
+  ChannelSecret:
+    Type: String
+    NoEcho: true
+  ChannelAccessToken:
+    Type: String
+    NoEcho: true
+
+Resources:
+  LineBotFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/index.handler
+      Runtime: nodejs22.x
+      CodeUri: lambda/
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          CHANNEL_SECRET: !Ref ChannelSecret
+          CHANNEL_ACCESS_TOKEN: !Ref ChannelAccessToken
+      Events:
+        Webhook:
+          Type: Api
+          Properties:
+            Path: /webhook
+            Method: post
+
+Outputs:
+  WebhookUrl:
+    Description: Webhook URL for LINE Developers Console
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/webhook"
