@@ -26,12 +26,42 @@ export async function handler(
 }
 
 async function handleEvent(event: WebhookEvent): Promise<void> {
+  if (event.type === "postback") {
+    return handlePostback(event);
+  }
+
   if (event.type !== "message" || event.message.type !== "text") {
     return;
   }
 
+  // テキストメッセージはオウム返し
   await client.replyMessage({
     replyToken: event.replyToken,
     messages: [{ type: "text", text: event.message.text }],
+  });
+}
+
+async function handlePostback(
+  event: WebhookEvent & { type: "postback" }
+): Promise<void> {
+  const data = event.postback.data;
+  let replyText: string;
+
+  switch (data) {
+    case "action=greeting":
+      replyText = "こんにちは！LINE Botです。何でも話しかけてくださいね。";
+      break;
+    case "action=help":
+      replyText =
+        "【使い方】\nメッセージを送ると、オウム返しします。\n\n画面下のメニューからも操作できます。";
+      break;
+    default:
+      replyText = `不明なアクション: ${data}`;
+      break;
+  }
+
+  await client.replyMessage({
+    replyToken: event.replyToken,
+    messages: [{ type: "text", text: replyText }],
   });
 }
